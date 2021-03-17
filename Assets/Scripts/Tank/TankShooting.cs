@@ -17,8 +17,10 @@ public class TankShooting : MonoBehaviour
     
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
-    private float m_ChargeSpeed;         
-    private bool m_Fired;                
+    private float m_ChargeSpeed;
+    private bool m_Fired;
+
+    ObjectPooler objectPooler;
 
 
     private void OnEnable()
@@ -33,6 +35,8 @@ public class TankShooting : MonoBehaviour
         m_FireButton = "Fire" + m_PlayerNumber;
 
         m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
+
+        objectPooler = ObjectPooler.Instance;
     }
     
 
@@ -76,13 +80,21 @@ public class TankShooting : MonoBehaviour
         // Instantiate and launch the shell.
         m_Fired = true;
 
-        Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+        GameObject shellObject = objectPooler.SpawnFromPool("Shell", m_FireTransform.position, m_FireTransform.rotation);
+        
+        if (shellObject != null)
+        {
+            Rigidbody shellInstance = shellObject.GetComponent<Rigidbody>();
+            shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
 
-        shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
+            m_ShootingAudio.clip = m_FireClip;
+            m_ShootingAudio.Play();
 
-        m_ShootingAudio.clip = m_FireClip;
-        m_ShootingAudio.Play();
+            m_CurrentLaunchForce = m_MinLaunchForce;
+        }
 
-        m_CurrentLaunchForce = m_MinLaunchForce;
+        // Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+
+        
     }
 }

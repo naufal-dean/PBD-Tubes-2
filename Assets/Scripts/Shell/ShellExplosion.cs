@@ -1,21 +1,26 @@
 ﻿using UnityEngine;
 
-public class ShellExplosion : MonoBehaviour
+public class ShellExplosion : MonoBehaviour, IPooledObject
 {
     public LayerMask m_TankMask;
-    public ParticleSystem m_ExplosionParticles;       
-    public AudioSource m_ExplosionAudio;              
-    public float m_MaxDamage = 100f;                  
-    public float m_ExplosionForce = 1000f;            
-    public float m_MaxLifeTime = 2f;                  
-    public float m_ExplosionRadius = 5f;              
+    public AudioSource m_ExplosionAudio;
+    public float m_MaxDamage = 100f;
+    public float m_ExplosionForce = 1000f;
+    public float m_MaxLifeTime = 2f;
+    public float m_ExplosionRadius = 5f;
+    ParticleSystem m_ExplosionParticles;
 
-
-    private void Start()
+    public void OnObjectSpawn()
     {
-        Destroy(gameObject, m_MaxLifeTime);
+        m_ExplosionParticles = ObjectPooler.Instance.SpawnFromPool("ShellExplosion", gameObject.transform.position).GetComponent<ParticleSystem>();
+        Invoke("Deactivate", m_MaxLifeTime);
     }
 
+    private void Deactivate()
+    {
+        gameObject.SetActive(false);
+        m_ExplosionParticles.gameObject.SetActive(false);
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -23,7 +28,7 @@ public class ShellExplosion : MonoBehaviour
 
         Collider[] colliders = Physics.OverlapSphere(transform.position, m_ExplosionRadius, m_TankMask);
 
-        for(int i = 0; i < colliders.Length; i++)
+        for (int i = 0; i < colliders.Length; i++)
         {
             Rigidbody targetRigidbody = colliders[i].GetComponent<Rigidbody>();
 
@@ -42,13 +47,11 @@ public class ShellExplosion : MonoBehaviour
             targetHealth.TakeDamage(damage);
         }
 
-        m_ExplosionParticles.transform.parent = null;
-
+        m_ExplosionParticles.transform.position = gameObject.transform.position;
         m_ExplosionParticles.Play();
         m_ExplosionAudio.Play();
 
-        Destroy(m_ExplosionParticles.gameObject, m_ExplosionParticles.duration);
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
 
