@@ -48,6 +48,7 @@ public class ShellExplosion : MonoBehaviour, IPooledObject
         }
 
         m_ExplosionParticles.transform.position = gameObject.transform.position;
+        m_ExplosionParticles.transform.rotation = gameObject.transform.rotation;
         m_ExplosionParticles.Play();
         m_ExplosionAudio.Play();
 

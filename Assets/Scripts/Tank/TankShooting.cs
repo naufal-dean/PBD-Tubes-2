@@ -77,7 +77,7 @@ public class TankShooting : MonoBehaviour
 
     private void Fire()
     {
-        // Instantiate and launch the shell.
+        // Activate and launch the shell.
         m_Fired = true;
 
         GameObject shellObject = objectPooler.SpawnFromPool("Shell", m_FireTransform.position, m_FireTransform.rotation);
@@ -93,8 +93,5 @@ public class TankShooting : MonoBehaviour
             m_CurrentLaunchForce = m_MinLaunchForce;
         }
 
-        // Rigidbody shellInstance = Instantiate(m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
-
-        
     }
 }
