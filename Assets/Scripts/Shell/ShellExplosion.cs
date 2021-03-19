@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Mirror;
+using UnityEngine;
 
-public class ShellExplosion : MonoBehaviour, IPooledObject
+public class ShellExplosion : NetworkBehaviour, IPooledObject
 {
     public LayerMask m_TankMask;
     public AudioSource m_ExplosionAudio;
@@ -10,17 +11,20 @@ public class ShellExplosion : MonoBehaviour, IPooledObject
     public float m_ExplosionRadius = 5f;
     ParticleSystem m_ExplosionParticles;
 
+
     public void OnObjectSpawn()
     {
         m_ExplosionParticles = ObjectPooler.Instance.SpawnFromPool("ShellExplosion", gameObject.transform.position).GetComponent<ParticleSystem>();
         Invoke("Deactivate", m_MaxLifeTime);
     }
 
+
     private void Deactivate()
     {
         gameObject.SetActive(false);
         m_ExplosionParticles.gameObject.SetActive(false);
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
@@ -44,7 +48,7 @@ public class ShellExplosion : MonoBehaviour, IPooledObject
 
             float damage = CalculateDamage(targetRigidbody.position);
 
-            targetHealth.TakeDamage(damage);
+            targetHealth.m_CurrentHealth = Mathf.Max(targetHealth.m_CurrentHealth - damage, 0);
         }
 
         m_ExplosionParticles.transform.position = gameObject.transform.position;

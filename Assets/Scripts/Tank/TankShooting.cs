@@ -42,6 +42,7 @@ public class TankShooting : NetworkBehaviour
     }
     
 
+    [ClientCallback]
     private void Update()
     {
         if (isLocalPlayer)
@@ -54,7 +55,6 @@ public class TankShooting : NetworkBehaviour
                 // max charged, not yet fired
                 m_CurrentLaunchForce = m_MaxLaunchForce;
                 Fire();
-
             }
             else if (Input.GetButtonDown(m_FireButton))
             {
@@ -83,23 +83,36 @@ public class TankShooting : NetworkBehaviour
     }
 
 
-    private void Fire()
+    [Client]
+    public void Fire()
     {
-        // Activate and launch the shell.
+        // Update fired flag
         m_Fired = true;
 
-        GameObject shellObject = objectPooler.SpawnFromPool("Shell", m_FireTransform.position, m_FireTransform.rotation);
+        // Fire from server
+        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_CurrentLaunchForce * m_FireTransform.forward);
+
+        // Play audio
+        m_ShootingAudio.clip = m_FireClip;
+        m_ShootingAudio.Play();
+
+        // Reset
+        m_CurrentLaunchForce = m_MinLaunchForce;
+    }
+
+
+    [Command]
+    private void CmdFire(Vector3 position, Quaternion rotation, Vector3 velocity)
+    {
+        // Launch the shell.
+        GameObject shellObject = objectPooler.SpawnFromPool("Shell", position, rotation);
         
         if (shellObject != null)
         {
             Rigidbody shellInstance = shellObject.GetComponent<Rigidbody>();
-            shellInstance.velocity = m_CurrentLaunchForce * m_FireTransform.forward;
+            shellInstance.velocity = velocity;
 
-            m_ShootingAudio.clip = m_FireClip;
-            m_ShootingAudio.Play();
-
-            m_CurrentLaunchForce = m_MinLaunchForce;
+            NetworkServer.Spawn(shellObject);
         }
-
     }
 }
