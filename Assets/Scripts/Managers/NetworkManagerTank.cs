@@ -49,7 +49,8 @@ public class NetworkManagerTank : NetworkManager
 
     public override void OnServerDisconnect(NetworkConnection conn)
     {
-        // TODO: remove player from list
+        TankBehaviour player = conn.identity.gameObject.GetComponent<TankBehaviour>();
+        m_Tanks.Remove(player);
 
         base.OnServerDisconnect(conn);
     }
@@ -69,10 +70,10 @@ public class NetworkManagerTank : NetworkManager
         player.m_PlayerNumber = numPlayers;
         player.m_PlayerColor = Random.ColorHSV(0f, 1f, 1f, 1f, 0.5f, 1f);
         player.m_Control = false;
-        player.SetSpawnPoint(startPos.position, startPos.rotation);
+        player.RpcSetSpawnPoint(startPos.position, startPos.rotation);
 
         // Set camera to point player
-        player.SetCameraTarget();
+        player.RpcSetCameraTarget();
 
         // Save player to list
         m_Tanks.Add(player);
@@ -216,7 +217,7 @@ public class NetworkManagerTank : NetworkManager
     {
         for (int i = 0; i < m_Tanks.Count; i++)
         {
-            m_Tanks[i].Reset();
+            m_Tanks[i].RpcReset();
         }
     }
 

@@ -42,7 +42,7 @@ public class TankBehaviour : NetworkBehaviour
 
 
     [ClientRpc]
-    public void SetCameraTarget()
+    public void RpcSetCameraTarget()
     {
         if (isLocalPlayer)
         {
@@ -68,7 +68,7 @@ public class TankBehaviour : NetworkBehaviour
 
 
     [ClientRpc]
-    public void SetSpawnPoint(Vector3 position, Quaternion rotation)
+    public void RpcSetSpawnPoint(Vector3 position, Quaternion rotation)
     {
         m_SpawnPointPosition = position;
         m_SpawnPointRotation = rotation;
@@ -104,7 +104,7 @@ public class TankBehaviour : NetworkBehaviour
 
 
     [ClientRpc]
-    public void Reset()
+    public void RpcReset()
     {
         transform.position = m_SpawnPointPosition;
         transform.rotation = m_SpawnPointRotation;
