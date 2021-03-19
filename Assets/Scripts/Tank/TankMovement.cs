@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using Mirror;
+using UnityEngine;
 
-public class TankMovement : MonoBehaviour
+public class TankMovement : NetworkBehaviour
 {
     public int m_PlayerNumber = 1;         
     public float m_Speed = 12f;            
@@ -41,8 +42,9 @@ public class TankMovement : MonoBehaviour
 
     private void Start()
     {
-        m_MovementAxisName = "Vertical" + m_PlayerNumber;
-        m_TurnAxisName = "Horizontal" + m_PlayerNumber;
+        // TODO: remove Vertical2 and Horizontal2 from input
+        m_MovementAxisName = "Vertical1";
+        m_TurnAxisName = "Horizontal1";
 
         m_OriginalPitch = m_MovementAudio.pitch;
     }
@@ -83,9 +85,12 @@ public class TankMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Move and turn the tank.
-        Move();
-        Turn();
+        if (isLocalPlayer)
+        {
+            // Move and turn the tank.
+            Move();
+            Turn();
+        }
     }
 
 

@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using Mirror;
+using UnityEngine;
 using UnityEngine.UI;
 
-public class TankShooting : MonoBehaviour
+public class TankShooting : NetworkBehaviour
 {
     public int m_PlayerNumber = 1;       
     public Rigidbody m_Shell;            
@@ -32,7 +33,8 @@ public class TankShooting : MonoBehaviour
 
     private void Start()
     {
-        m_FireButton = "Fire" + m_PlayerNumber;
+        // TODO: remove Fire2 from input
+        m_FireButton = "Fire1";
 
         m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
 
@@ -42,35 +44,41 @@ public class TankShooting : MonoBehaviour
 
     private void Update()
     {
-        // Track the current state of the fire button and make decisions based on the current launch force.
-        m_AimSlider.value = m_MinLaunchForce;
-
-        if(m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
+        if (isLocalPlayer)
         {
-            // max charged, not yet fired
-            m_CurrentLaunchForce = m_MaxLaunchForce; 
-            Fire();
+            // Track the current state of the fire button and make decisions based on the current launch force.
+            m_AimSlider.value = m_MinLaunchForce;
 
-        } else if(Input.GetButtonDown(m_FireButton))
-        {
-            // have we pressed fire for the first time?
-            m_Fired = false;
-            m_CurrentLaunchForce = m_MinLaunchForce;
+            if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
+            {
+                // max charged, not yet fired
+                m_CurrentLaunchForce = m_MaxLaunchForce;
+                Fire();
 
-            m_ShootingAudio.clip = m_ChargingClip;
-            m_ShootingAudio.Play();
+            }
+            else if (Input.GetButtonDown(m_FireButton))
+            {
+                // have we pressed fire for the first time?
+                m_Fired = false;
+                m_CurrentLaunchForce = m_MinLaunchForce;
 
-        } else if(Input.GetButton(m_FireButton) && !m_Fired)
-        {
-            // Holding the fire button, not yet fired
-            m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+                m_ShootingAudio.clip = m_ChargingClip;
+                m_ShootingAudio.Play();
 
-            m_AimSlider.value = m_CurrentLaunchForce;
+            }
+            else if (Input.GetButton(m_FireButton) && !m_Fired)
+            {
+                // Holding the fire button, not yet fired
+                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
 
-        } else if(Input.GetButtonUp(m_FireButton) && !m_Fired)
-        {
-            // released the button, having not fired yet
-            Fire();
+                m_AimSlider.value = m_CurrentLaunchForce;
+
+            }
+            else if (Input.GetButtonUp(m_FireButton) && !m_Fired)
+            {
+                // released the button, having not fired yet
+                Fire();
+            }
         }
     }
 
