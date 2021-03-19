@@ -3,14 +3,13 @@
 public class CameraControl : MonoBehaviour
 {
     public float m_DampTime = 0.2f;                 
-    public float m_ScreenEdgeBuffer = 4f;           
-    public float m_MinSize = 6.5f;                  
-    [HideInInspector] public Transform[] m_Targets; 
+    public float m_ScreenSize = 10f;     
+    [HideInInspector] public Transform m_Target;
 
 
     private Camera m_Camera;                        
     private float m_ZoomSpeed;                      
-    private Vector3 m_MoveVelocity;                 
+    private Vector3 m_MoveVelocity;
     private Vector3 m_DesiredPosition;              
 
 
@@ -29,32 +28,21 @@ public class CameraControl : MonoBehaviour
 
     private void Move()
     {
-        FindAveragePosition();
+        FindPosition();
 
         transform.position = Vector3.SmoothDamp(transform.position, m_DesiredPosition, ref m_MoveVelocity, m_DampTime);
     }
 
 
-    private void FindAveragePosition()
+    private void FindPosition()
     {
-        Vector3 averagePos = new Vector3();
-        int numTargets = 0;
+        Vector3 targetPos = new Vector3();
+        if (m_Target)
+            targetPos = m_Target.position;
 
-        for (int i = 0; i < m_Targets.Length; i++)
-        {
-            if (!m_Targets[i].gameObject.activeSelf)
-                continue;
+        targetPos.y = transform.position.y;
 
-            averagePos += m_Targets[i].position;
-            numTargets++;
-        }
-
-        if (numTargets > 0)
-            averagePos /= numTargets;
-
-        averagePos.y = transform.position.y;
-
-        m_DesiredPosition = averagePos;
+        m_DesiredPosition = targetPos;
     }
 
 
@@ -67,35 +55,13 @@ public class CameraControl : MonoBehaviour
 
     private float FindRequiredSize()
     {
-        Vector3 desiredLocalPos = transform.InverseTransformPoint(m_DesiredPosition);
-
-        float size = 0f;
-
-        for (int i = 0; i < m_Targets.Length; i++)
-        {
-            if (!m_Targets[i].gameObject.activeSelf)
-                continue;
-
-            Vector3 targetLocalPos = transform.InverseTransformPoint(m_Targets[i].position);
-
-            Vector3 desiredPosToTarget = targetLocalPos - desiredLocalPos;
-
-            size = Mathf.Max (size, Mathf.Abs (desiredPosToTarget.y));
-
-            size = Mathf.Max (size, Mathf.Abs (desiredPosToTarget.x) / m_Camera.aspect);
-        }
-        
-        size += m_ScreenEdgeBuffer;
-
-        size = Mathf.Max(size, m_MinSize);
-
-        return size;
+        return m_ScreenSize;
     }
 
 
     public void SetStartPositionAndSize()
     {
-        FindAveragePosition();
+        FindPosition();
 
         transform.position = m_DesiredPosition;
 

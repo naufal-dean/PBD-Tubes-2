@@ -24,6 +24,7 @@ public class NetworkManagerTank : NetworkManager
     private WaitForSeconds m_EndWait;
     private TankBehaviour m_RoundWinner;
     private TankBehaviour m_GameWinner;
+    private UIText m_UIText;
 
 
     public override void Start()
@@ -32,8 +33,12 @@ public class NetworkManagerTank : NetworkManager
 
         m_StartWait = new WaitForSeconds(m_StartDelay);
         m_EndWait = new WaitForSeconds(m_EndDelay);
+
+        m_UIText = m_MessageText.GetComponent<UIText>();
     }
 
+
+    #region Server
 
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
@@ -56,13 +61,14 @@ public class NetworkManagerTank : NetworkManager
     }
 
 
+    [Server]
     private void SpawnTank(NetworkConnection conn)
     {
         // Instanstiate player
         Transform startPos = GetTankSpawnPoint();
         TankBehaviour player =
             Instantiate(playerPrefab, startPos.position, startPos.rotation).GetComponent<TankBehaviour>();
-        
+
         // Add player
         NetworkServer.AddPlayerForConnection(conn, player.gameObject);
 
@@ -80,6 +86,7 @@ public class NetworkManagerTank : NetworkManager
     }
 
 
+    [Server]
     private Transform GetTankSpawnPoint()
     {
         // TODO: randomize spawn point
@@ -88,6 +95,7 @@ public class NetworkManagerTank : NetworkManager
     }
 
 
+    [Server]
     private IEnumerator GameLoop()
     {
         yield return StartCoroutine(RoundStarting());
@@ -105,6 +113,7 @@ public class NetworkManagerTank : NetworkManager
     }
 
 
+    [Server]
     private IEnumerator RoundStarting()
     {
         ResetAllTanks();
@@ -113,17 +122,18 @@ public class NetworkManagerTank : NetworkManager
         m_CameraControl.SetStartPositionAndSize();
 
         m_RoundNumber++;
-        m_MessageText.text = "ROUND " + m_RoundNumber;
+        m_UIText.RpcSetMessageText("ROUND " + m_RoundNumber);
 
         yield return m_StartWait;
     }
 
 
+    [Server]
     private IEnumerator RoundPlaying()
     {
         EnableTankControl();
 
-        m_MessageText.text = string.Empty;
+        m_UIText.RpcSetMessageText(string.Empty);
 
         while (!OneTankLeft())
         {
@@ -133,6 +143,7 @@ public class NetworkManagerTank : NetworkManager
     }
 
 
+    [Server]
     private IEnumerator RoundEnding()
     {
         DisableTankControl();
@@ -147,12 +158,13 @@ public class NetworkManagerTank : NetworkManager
         m_GameWinner = GetGameWinner();
 
         string message = EndMessage();
-        m_MessageText.text = message;
+        m_UIText.RpcSetMessageText(message);
 
         yield return m_EndWait;
     }
 
 
+    [Server]
     private bool OneTankLeft()
     {
         int numTanksLeft = 0;
@@ -167,6 +179,7 @@ public class NetworkManagerTank : NetworkManager
     }
 
 
+    [Server]
     private TankBehaviour GetRoundWinner()
     {
         for (int i = 0; i < m_Tanks.Count; i++)
@@ -179,6 +192,7 @@ public class NetworkManagerTank : NetworkManager
     }
 
 
+    [Server]
     private TankBehaviour GetGameWinner()
     {
         for (int i = 0; i < m_Tanks.Count; i++)
@@ -191,6 +205,7 @@ public class NetworkManagerTank : NetworkManager
     }
 
 
+    [Server]
     private string EndMessage()
     {
         string message = "DRAW!";
@@ -240,4 +255,6 @@ public class NetworkManagerTank : NetworkManager
             m_Tanks[i].m_Control = false;
         }
     }
+
+    #endregion
 }

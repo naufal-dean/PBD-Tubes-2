@@ -85,12 +85,12 @@ public class TankMovement : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (isLocalPlayer)
-        {
-            // Move and turn the tank.
-            Move();
-            Turn();
-        }
+        if (!isLocalPlayer)
+            return;
+
+        // Move and turn the tank.
+        Move();
+        Turn();
     }
 
 

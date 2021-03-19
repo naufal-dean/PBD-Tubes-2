@@ -40,45 +40,47 @@ public class TankShooting : NetworkBehaviour
 
         objectPooler = ObjectPooler.Instance;
     }
-    
+
+
+    #region Client
 
     [ClientCallback]
     private void Update()
     {
-        if (isLocalPlayer)
+        if (!isLocalPlayer)
+            return;
+
+        // Track the current state of the fire button and make decisions based on the current launch force.
+        m_AimSlider.value = m_MinLaunchForce;
+
+        if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
         {
-            // Track the current state of the fire button and make decisions based on the current launch force.
-            m_AimSlider.value = m_MinLaunchForce;
+            // max charged, not yet fired
+            m_CurrentLaunchForce = m_MaxLaunchForce;
+            Fire();
+        }
+        else if (Input.GetButtonDown(m_FireButton))
+        {
+            // have we pressed fire for the first time?
+            m_Fired = false;
+            m_CurrentLaunchForce = m_MinLaunchForce;
 
-            if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
-            {
-                // max charged, not yet fired
-                m_CurrentLaunchForce = m_MaxLaunchForce;
-                Fire();
-            }
-            else if (Input.GetButtonDown(m_FireButton))
-            {
-                // have we pressed fire for the first time?
-                m_Fired = false;
-                m_CurrentLaunchForce = m_MinLaunchForce;
+            m_ShootingAudio.clip = m_ChargingClip;
+            m_ShootingAudio.Play();
 
-                m_ShootingAudio.clip = m_ChargingClip;
-                m_ShootingAudio.Play();
+        }
+        else if (Input.GetButton(m_FireButton) && !m_Fired)
+        {
+            // Holding the fire button, not yet fired
+            m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
 
-            }
-            else if (Input.GetButton(m_FireButton) && !m_Fired)
-            {
-                // Holding the fire button, not yet fired
-                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+            m_AimSlider.value = m_CurrentLaunchForce;
 
-                m_AimSlider.value = m_CurrentLaunchForce;
-
-            }
-            else if (Input.GetButtonUp(m_FireButton) && !m_Fired)
-            {
-                // released the button, having not fired yet
-                Fire();
-            }
+        }
+        else if (Input.GetButtonUp(m_FireButton) && !m_Fired)
+        {
+            // released the button, having not fired yet
+            Fire();
         }
     }
 
@@ -100,6 +102,10 @@ public class TankShooting : NetworkBehaviour
         m_CurrentLaunchForce = m_MinLaunchForce;
     }
 
+    #endregion
+
+
+    #region Server
 
     [Command]
     private void CmdFire(Vector3 position, Quaternion rotation, Vector3 velocity)
@@ -115,4 +121,6 @@ public class TankShooting : NetworkBehaviour
             NetworkServer.Spawn(shellObject);
         }
     }
+
+    #endregion
 }

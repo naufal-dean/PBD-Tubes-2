@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class TankHealth : NetworkBehaviour
 {
+    [SyncVar(hook = nameof(TakeDamage))]
+    public float m_CurrentHealth;
+
     public float m_StartingHealth = 100f;          
     public Slider m_Slider;                        
     public Image m_FillImage;                      
@@ -11,10 +14,7 @@ public class TankHealth : NetworkBehaviour
     public Color m_ZeroHealthColor = Color.red;    
     public GameObject m_ExplosionPrefab;
 
-
-    [SyncVar(hook = nameof(TakeDamage))]
-    public float m_CurrentHealth;
-
+    
     private AudioSource m_ExplosionAudio;          
     private ParticleSystem m_ExplosionParticles;
     private bool m_Dead;            
@@ -36,12 +36,14 @@ public class TankHealth : NetworkBehaviour
 
         SetHealthUI();
     }
-    
+
+
+    #region Client
 
     [Client]
     public void TakeDamage(float oldCurrentHealth, float newCurrentHealth)
     {
-        // Adjust the tank's current health, update the UI based on the new health and check whether or not the tank is dead.
+        // Update the UI based on the new health and check whether or not the tank is dead.
         SetHealthUI();
         if (m_CurrentHealth <= 0f && !m_Dead)
         {
@@ -60,6 +62,7 @@ public class TankHealth : NetworkBehaviour
     }
 
 
+    [Client]
     private void OnDeath()
     {
         // Play the effects for the death of the tank and deactivate it.
@@ -73,4 +76,6 @@ public class TankHealth : NetworkBehaviour
 
         gameObject.SetActive(false);
     }
+
+    #endregion
 }

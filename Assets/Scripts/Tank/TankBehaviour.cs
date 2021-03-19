@@ -7,27 +7,25 @@ public class TankBehaviour : NetworkBehaviour
 {
     [SyncVar(hook = nameof(SetColor))]
     public Color m_PlayerColor;
-    
+
+    [SyncVar(hook = nameof(Setup))]
+    [HideInInspector] public int m_PlayerNumber;
+
+    [SyncVar(hook = nameof(SetControl))]
+    [HideInInspector] public bool m_Control;
+
     public Vector3 m_SpawnPointPosition;
     public Quaternion m_SpawnPointRotation;
-
-    [HideInInspector] [SyncVar(hook = nameof(Setup))]
-    public int m_PlayerNumber;
-    
-    [HideInInspector] [SyncVar(hook = nameof(SetControl))]
-    public bool m_Control;
-    
-    [HideInInspector]
-    public string m_ColoredPlayerText;
-    
-    [HideInInspector]
-    public int m_Wins;
+    [HideInInspector] public string m_ColoredPlayerText;
+    [HideInInspector] public int m_Wins;
 
 
     private TankMovement m_Movement;
     private TankShooting m_Shooting;
     private GameObject m_CanvasGameObject;
 
+
+    #region Client
 
     [Client]
     public void Setup(int oldPlayerNumber, int newPlayerNumber)
@@ -46,8 +44,7 @@ public class TankBehaviour : NetworkBehaviour
     {
         if (isLocalPlayer)
         {
-            ((NetworkManagerTank) NetworkManager.singleton).m_CameraControl.m_Targets =
-                new Transform[] { transform };
+            ((NetworkManagerTank)NetworkManager.singleton).m_CameraControl.m_Target = transform;
         }
     }
 
@@ -112,4 +109,6 @@ public class TankBehaviour : NetworkBehaviour
         gameObject.SetActive(false);
         gameObject.SetActive(true);
     }
+
+    #endregion
 }
