@@ -14,6 +14,7 @@ public class NetworkManagerTank : NetworkManager
     public CameraControl m_CameraControl;
     public Text m_MessageText;
     public List<TankBehaviour> m_Tanks;
+    public NetworkManagerHUD networkManagerHUD;
 
     // TODO: remove after spawn point is randomized
     public Transform m_SpawnPoint;
@@ -37,6 +38,22 @@ public class NetworkManagerTank : NetworkManager
         m_UIText = m_MessageText.GetComponent<UIText>();
     }
 
+    #region Client
+
+    [Client]
+    public void PauseGame()
+    {
+        networkManagerHUD.showGUI = true;
+
+    }
+
+    [Client]
+    public void ResumeGame()
+    {
+        networkManagerHUD.showGUI = false;
+    }
+
+    #endregion
 
     #region Server
 
@@ -48,6 +65,7 @@ public class NetworkManagerTank : NetworkManager
         if (numPlayers == m_MaxNumPlayers)
         {
             StartCoroutine(GameLoop());
+            networkManagerHUD.showGUI = false;
         }
     }
 
