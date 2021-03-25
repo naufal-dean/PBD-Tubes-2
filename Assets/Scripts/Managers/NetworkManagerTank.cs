@@ -44,6 +44,7 @@ public class NetworkManagerTank : NetworkManager
     public void PauseGame()
     {
         networkManagerHUD.showGUI = true;
+        Debug.Log(networkManagerHUD.showGUI);
 
     }
 
@@ -56,6 +57,23 @@ public class NetworkManagerTank : NetworkManager
     [Client]
     public void QuitGame()
     {
+        // stop host if host mode
+        if (NetworkServer.active && NetworkClient.isConnected)
+        {
+            StopHost();
+        }
+        // stop client if client-only
+        else if (NetworkClient.isConnected)
+        {
+            StopClient();
+        }
+        // stop server if server-only
+        else if (NetworkServer.active)
+        {
+            StopServer();
+        }
+
+
         networkManagerHUD.showGUI = false;
     }
 
