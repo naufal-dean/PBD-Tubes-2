@@ -53,6 +53,12 @@ public class NetworkManagerTank : NetworkManager
         networkManagerHUD.showGUI = false;
     }
 
+    [Client]
+    public void QuitGame()
+    {
+        networkManagerHUD.showGUI = false;
+    }
+
     #endregion
 
     #region Server
