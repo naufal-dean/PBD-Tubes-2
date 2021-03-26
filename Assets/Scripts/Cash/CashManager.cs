@@ -37,7 +37,10 @@ public class CashManager : NetworkBehaviour
 
         _spawnInterval = new WaitForSeconds(_intervalTime);
         _spawnDelay = new WaitForSeconds(_delayTime);
-        StartCoroutine(SpawnCash());
+        if (isServer)
+        {
+            StartCoroutine(SpawnCash());
+        }
     }
 
     void Update()

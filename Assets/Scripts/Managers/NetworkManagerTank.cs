@@ -124,6 +124,9 @@ public class NetworkManagerTank : NetworkManager
         // Set camera to point player
         player.RpcSetCameraTarget();
 
+        // TODO: remove, just for testing
+        player.CmdSpawnSoldier(startPos.position, startPos.rotation);
+
         // Save player to list
         m_Tanks.Add(player);
     }
@@ -213,6 +216,9 @@ public class NetworkManagerTank : NetworkManager
     [Server]
     private bool OneTankLeft()
     {
+        // TODO: remove
+        return false;
+
         int numTanksLeft = 0;
 
         for (int i = 0; i < m_Tanks.Count; i++)

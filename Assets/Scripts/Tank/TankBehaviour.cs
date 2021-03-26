@@ -25,6 +25,33 @@ public class TankBehaviour : NetworkBehaviour
     private TankMovement m_Movement;
     private TankShooting m_Shooting;
     private GameObject m_CanvasGameObject;
+    private ObjectPooler objectPooler;
+
+
+    private void Awake()
+    {
+        objectPooler = ObjectPooler.Instance;
+    }
+
+
+    #region Server
+
+    // TODO: change to command and call from client
+    [Server]
+    public void CmdSpawnSoldier(Vector3 position, Quaternion rotation)
+    {
+        GameObject soldierObject = objectPooler.SpawnFromPool("Soldier", position, rotation);
+
+        if (soldierObject != null)
+        {
+            NetworkServer.Spawn(soldierObject);
+
+            soldierObject.GetComponent<SoldierMovement>().RpcSetTankOwner(gameObject);
+            soldierObject.GetComponent<SoldierAttack>().RpcSetTankOwner(gameObject);
+        }
+    }
+
+    #endregion
 
 
     #region Client

@@ -1,68 +1,33 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SoldierMovement : MonoBehaviour
+public class SoldierMovement : NetworkBehaviour
 {
-    Transform player;
-    //PlayerHealth playerHealth;
-    //EnemyHealth enemyHealth;
-    UnityEngine.AI.NavMeshAgent nav;
-
     public LayerMask m_TankMask;
     public float m_TargetRadius = 10f;
 
+    private TankBehaviour m_TankOwner;
+    private Animator anim;
+    private UnityEngine.AI.NavMeshAgent nav;
+
     void Awake()
     {
-        //player = GameObject.FindGameObjectWithTag("Player").transform;
-
-        //playerHealth = player.GetComponent<PlayerHealth>();
-        //enemyHealth = GetComponent<EnemyHealth>();
+        anim = GetComponent<Animator>();
         nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
     }
 
 
     void Update()
     {
-        //Debug.Log("ok");
-        //// TODO: remove
-        //nav.SetDestination(new Vector3(-3f, 0f, 30f));
-
-        //// Find all the tanks in an area around the shell and damage them.
-        //Collider[] targets = Physics.OverlapSphere(transform.position, m_TargetRadius, m_TankMask);
-
-        //for (int i = 0; i < targets.Length; i++)
-        //{
-        //    Rigidbody targetRigidbody = targets[i].GetComponent<Rigidbody>();
-
-        //    if (!targetRigidbody)
-        //        continue;
-
-        //    targetRigidbody.AddExplosionForce(m_ExplosionForce, transform.position, m_ExplosionRadius);
-
-        //    TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth>();
-
-        //    if (!targetHealth)
-        //        continue;
-
-        //    float damage = CalculateDamage(targetRigidbody.position);
-
-        //    targetHealth.m_CurrentHealth = Mathf.Max(targetHealth.m_CurrentHealth - damage, 0);
-        //}
-
-        //Explode(gameObject.transform.position, gameObject.transform.rotation);
-
-        //gameObject.SetActive(false);
-        //Invoke(nameof(Deactivate), 0.5f);
-
-        ////Memindahkan posisi player
-        //if (enemyHealth.currentHealth > 0 && playerHealth.currentHealth > 0)
-        //{
-        //    nav.SetDestination(player.position);
-        //}
-        //else //Hentikan moving
-        //{
-        //    nav.enabled = false;
-        //}
+        if (isClient && m_TankOwner)
+        {
+            nav.SetDestination(m_TankOwner.gameObject.transform.position);
+        }
     }
+
+
+    [ClientRpc]
+    public void RpcSetTankOwner(GameObject tankOwner) => m_TankOwner = tankOwner.GetComponent<TankBehaviour>();
 }
