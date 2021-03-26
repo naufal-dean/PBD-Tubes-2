@@ -34,7 +34,7 @@ public class TankShooting : NetworkBehaviour
     private void Start()
     {
         // TODO: remove Fire2 from input
-        m_FireButton = "Fire1";
+        m_FireButton = "Fire";
 
         m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
 
