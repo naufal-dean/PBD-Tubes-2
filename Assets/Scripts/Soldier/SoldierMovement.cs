@@ -23,7 +23,16 @@ public class SoldierMovement : NetworkBehaviour
     {
         if (isClient && m_TankOwner)
         {
-            nav.SetDestination(m_TankOwner.gameObject.transform.position);
+            if (Vector3.Distance(gameObject.transform.position, m_TankOwner.gameObject.transform.position) <= 10f)
+            {
+                anim.SetTrigger("Stop");
+                nav.SetDestination(gameObject.transform.position);
+            }
+            else
+            {
+                anim.SetTrigger("Run");
+                nav.SetDestination(m_TankOwner.gameObject.transform.position);
+            }
         }
     }
 
