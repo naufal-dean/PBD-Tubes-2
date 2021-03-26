@@ -1,8 +1,9 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SoldierAttack : MonoBehaviour
+public class SoldierAttack : NetworkBehaviour
 {
     public float timeBetweenAttacks = 0.5f;
     public int attackDamage = 10;
@@ -14,6 +15,7 @@ public class SoldierAttack : MonoBehaviour
     //EnemyHealth enemyHealth;
     bool playerInRange;
     float timer;
+    private TankBehaviour m_TankOwner;
 
 
     void Awake()
@@ -72,4 +74,8 @@ public class SoldierAttack : MonoBehaviour
         //    playerHealth.TakeDamage(attackDamage);
         //}
     }
+
+
+    [ClientRpc]
+    public void RpcSetTankOwner(GameObject tankOwner) => m_TankOwner = tankOwner.GetComponent<TankBehaviour>();
 }
