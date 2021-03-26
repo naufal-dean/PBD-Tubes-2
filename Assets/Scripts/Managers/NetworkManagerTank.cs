@@ -24,8 +24,9 @@ public class NetworkManagerTank : NetworkManager
     private WaitForSeconds m_StartWait;
     private WaitForSeconds m_EndWait;
     private TankBehaviour m_RoundWinner;
-    private TankBehaviour m_GameWinner;
     private UIText m_UIText;
+    public TankBehaviour m_GameWinner;
+    public bool m_GameRunning = false;
 
 
     public override void Start()
@@ -173,6 +174,7 @@ public class NetworkManagerTank : NetworkManager
     [Server]
     private IEnumerator RoundPlaying()
     {
+        m_GameRunning = true;
         EnableTankControl();
 
         m_UIText.RpcSetMessageText(string.Empty);
@@ -188,6 +190,8 @@ public class NetworkManagerTank : NetworkManager
     [Server]
     private IEnumerator RoundEnding()
     {
+        m_GameRunning = false;
+
         DisableTankControl();
 
         m_RoundWinner = null;
