@@ -12,30 +12,47 @@ public class ShellExplosion : NetworkBehaviour, IPooledObject
     ParticleSystem m_ExplosionParticles;
 
 
+    #region Server
+
     [Server]
     public void OnObjectSpawn()
     {
-        m_ExplosionParticles = ObjectPooler.Instance.SpawnFromPool("ShellExplosion", gameObject.transform.position).GetComponent<ParticleSystem>();
         Invoke(nameof(Deactivate), m_MaxLifeTime);
-        NetworkServer.Spawn(m_ExplosionParticles.gameObject);
     }
 
     [Server]
     private void Deactivate()
     {
         gameObject.SetActive(false);
-        m_ExplosionParticles.gameObject.SetActive(false);
         NetworkServer.UnSpawn(gameObject);
-        NetworkServer.UnSpawn(m_ExplosionParticles.gameObject);
     }
 
-    [Server]
+    [Command]
+    private void CmdDeactivate()
+    {
+        Deactivate();
+    }
+
+    #endregion
+
+
+    #region Client
+
+    [Client]
     private void Explode(Vector3 position, Quaternion rotation)
     {
-        m_ExplosionParticles.transform.position = position;
-        m_ExplosionParticles.transform.rotation = rotation;
+        m_ExplosionParticles = ObjectPooler.Instance.SpawnFromPool("ShellExplosion", position, rotation).GetComponent<ParticleSystem>();
         m_ExplosionParticles.Play();
         m_ExplosionAudio.Play();
+
+        Invoke(nameof(ExplodeDeactivate), 0.5f);
+    }
+
+    [Client]
+    private void ExplodeDeactivate()
+    {
+        m_ExplosionParticles.gameObject.SetActive(false);
+        CmdDeactivate();
     }
 
     [Client]
@@ -66,10 +83,9 @@ public class ShellExplosion : NetworkBehaviour, IPooledObject
         Explode(gameObject.transform.position, gameObject.transform.rotation);
 
         gameObject.SetActive(false);
-        Invoke(nameof(Deactivate), 0.5f);
     }
 
-    [Server]
+    [Client]
     private float CalculateDamage(Vector3 targetPosition)
     {
         // Calculate the amount of damage a target should take based on it's position.
@@ -85,4 +101,6 @@ public class ShellExplosion : NetworkBehaviour, IPooledObject
 
         return damage;
     }
+
+    #endregion
 }
