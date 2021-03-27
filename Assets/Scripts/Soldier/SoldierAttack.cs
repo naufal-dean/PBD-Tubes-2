@@ -9,42 +9,35 @@ public class SoldierAttack : NetworkBehaviour
     public int attackDamage = 10;
 
 
-    Animator anim;
-    GameObject player;
-    //PlayerHealth playerHealth;
-    //EnemyHealth enemyHealth;
-    bool playerInRange;
-    float timer;
-    private TankBehaviour m_TankOwner;
+    public TankBehaviour m_TankOwner;
+    private Animator anim;
+    private bool playerInRange;
+    private float timer;
 
 
     void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
-        //playerHealth = player.GetComponent<PlayerHealth>();
         anim = GetComponent<Animator>();
-        // Mendapatkan Enemy health
-        //enemyHealth = GetComponent<EnemyHealth>();
     }
 
     // Callback jika ada suatu object masuk ke dalam trigger
     void OnTriggerEnter(Collider other)
     {
         // Set player in range
-        if (other.gameObject == player && other.isTrigger == false)
-        {
-            playerInRange = true;
+        //if (other.gameObject == player && other.isTrigger == false)
+        //{
+        //    playerInRange = true;
 
-        }
+        //}
     }
 
     // Callback jika ada object yang keluar dari trigger
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject == player && other.isTrigger == false)
-        {
-            playerInRange = false;
-        }
+        //if (other.gameObject == player && other.isTrigger == false)
+        //{
+        //    playerInRange = false;
+        //}
     }
 
 

@@ -8,7 +8,7 @@ public class SoldierMovement : NetworkBehaviour
     public LayerMask m_TankMask;
     public float m_TargetRadius = 15f;
 
-    private TankBehaviour m_TankOwner;
+    public TankBehaviour m_TankOwner;
     private Animator anim;
     private UnityEngine.AI.NavMeshAgent nav;
 
@@ -19,9 +19,12 @@ public class SoldierMovement : NetworkBehaviour
     }
 
 
+    #region Server
+
+    [ServerCallback]
     void Update()
     {
-        if (!isClient) return;
+        if (!isServer) return;
 
         if (!m_TankOwner) return;
 
@@ -56,6 +59,7 @@ public class SoldierMovement : NetworkBehaviour
     }
 
 
+    [Server]
     private GameObject DetectEnemyPosition()
     {
         GameObject target = null;
@@ -90,7 +94,13 @@ public class SoldierMovement : NetworkBehaviour
         return target;
     }
 
+    #endregion
+
+
+    #region Client
 
     [ClientRpc]
     public void RpcSetTankOwner(GameObject tankOwner) => m_TankOwner = tankOwner.GetComponent<TankBehaviour>();
+
+    #endregion
 }

@@ -46,8 +46,11 @@ public class TankBehaviour : NetworkBehaviour
         {
             NetworkServer.Spawn(soldierObject);
 
-            soldierObject.GetComponent<SoldierMovement>().RpcSetTankOwner(gameObject);
-            soldierObject.GetComponent<SoldierAttack>().RpcSetTankOwner(gameObject);
+            soldierObject.GetComponent<SoldierMovement>().m_TankOwner = this;
+            soldierObject.GetComponent<SoldierAttack>().m_TankOwner = this;
+
+            //soldierObject.GetComponent<SoldierMovement>().RpcSetTankOwner(gameObject);
+            //soldierObject.GetComponent<SoldierAttack>().RpcSetTankOwner(gameObject);
         }
     }
 

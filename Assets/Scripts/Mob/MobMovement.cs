@@ -19,6 +19,8 @@ public class MobMovement : NetworkBehaviour
     }
 
 
+    #region Server
+
     [ServerCallback]
     void Update()
     {
@@ -87,7 +89,13 @@ public class MobMovement : NetworkBehaviour
         return target;
     }
 
+    #endregion
+
+
+    #region Client
 
     [ClientRpc]
     public void RpcSetTankOwner(GameObject tankOwner) => m_TankOwner = tankOwner.GetComponent<TankBehaviour>();
+
+    #endregion
 }
