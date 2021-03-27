@@ -126,6 +126,13 @@ public class NetworkManagerTank : NetworkManager
 
             // Set camera to point player
             player.RpcSetCameraTarget();
+
+            // Start game loop
+            StartCoroutine(GameLoop());
+
+            // Hide gui
+            // TODO: create RPC and hide on all client
+            networkManagerHUD.showGUI = false;
         }
     }
 
