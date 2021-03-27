@@ -5,13 +5,13 @@ using UnityEngine;
 
 public class SoldierAttack : InfantryAttack
 {
-    public float timeBetweenAttacks = 0.5f;
-    public int attackDamage = 10;
-
+    public LayerMask m_TankMask;
+    public float m_TimeBetweenAttacks = 0.5f;
+    public int m_AttackDamage = 10;
+    public float m_AttackRange = 15;
 
     private Animator anim;
-    private bool playerInRange;
-    private float timer;
+    private float m_Timer;
 
 
     void Awake()
@@ -19,52 +19,64 @@ public class SoldierAttack : InfantryAttack
         anim = GetComponent<Animator>();
     }
 
-    // Callback jika ada suatu object masuk ke dalam trigger
-    void OnTriggerEnter(Collider other)
-    {
-        // Set player in range
-        //if (other.gameObject == player && other.isTrigger == false)
-        //{
-        //    playerInRange = true;
 
-        //}
-    }
-
-    // Callback jika ada object yang keluar dari trigger
-    void OnTriggerExit(Collider other)
-    {
-        //if (other.gameObject == player && other.isTrigger == false)
-        //{
-        //    playerInRange = false;
-        //}
-    }
-
-
+    [ServerCallback]
     void Update()
     {
-        //timer += Time.deltaTime;
+        if (!isServer) return;
 
-        //if (timer >= timeBetweenAttacks && playerInRange && enemyHealth.currentHealth > 0)
-        //{
-        //    Attack();
-        //}
+        m_Timer += Time.deltaTime;
 
-        //if (playerHealth.currentHealth <= 0)
-        //{
-        //    anim.SetTrigger("PlayerDead");
-        //}
+        if (m_Timer >= m_TimeBetweenAttacks)
+        {
+            Attack();
+        }
     }
 
 
+    [Server]
     void Attack()
     {
-        //timer = 0f;
+        // Find all the tanks in an area around the soldier.
+        Collider[] colliders = Physics.OverlapSphere(transform.position, m_AttackRange, m_TankMask);
 
-        //// Taking damage
-        //if (playerHealth.currentHealth > 0)
-        //{
-        //    playerHealth.TakeDamage(attackDamage);
-        //}
+        // Damage all enemy tanks in area
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Rigidbody targetRigidbody = colliders[i].GetComponent<Rigidbody>();
+
+            if (!targetRigidbody)
+                continue;
+
+            TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth>();
+
+            if (!targetHealth)
+                continue;
+
+            if (targetHealth.gameObject.GetComponent<TankBehaviour>() == m_TankOwner)
+                continue;
+
+            Shoot(targetHealth.gameObject.transform.position);
+        }
+
+        // Reset timer
+        m_Timer = 0f;
+    }
+
+
+    [Server]
+    void Shoot(Vector3 targetPosition)
+    {
+        // Launch the shell.
+        GameObject shellObject = ObjectPooler.Instance.SpawnFromPool("Shell", transform.position + gameObject.transform.forward * 3, transform.rotation);
+
+        if (shellObject != null)
+        {
+            Rigidbody shellInstance = shellObject.GetComponent<Rigidbody>();
+            shellInstance.velocity = Vector3.Normalize(targetPosition - transform.position) * 3f;
+
+            NetworkServer.Spawn(shellObject);
+        }
     }
 
 
