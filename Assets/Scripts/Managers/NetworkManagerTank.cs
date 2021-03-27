@@ -15,6 +15,7 @@ public class NetworkManagerTank : NetworkManager
     public Text m_MessageText;
     public List<TankBehaviour> m_Tanks;
     public NetworkManagerHUD networkManagerHUD;
+    public Transform[] m_SpawnPoints;  // need to be defined with minimum length m_MaxNumPlayers
 
     // TODO: remove after spawn point is randomized
     public Transform m_SpawnPoint;
@@ -84,6 +85,12 @@ public class NetworkManagerTank : NetworkManager
 
     public override void OnServerAddPlayer(NetworkConnection conn)
     {
+        if (numPlayers >= m_MaxNumPlayers)
+        {
+            print("Room is full");
+            return;
+        }
+
         SpawnTank(conn);
 
         // Start game if player number is enough
@@ -101,6 +108,22 @@ public class NetworkManagerTank : NetworkManager
         m_Tanks.Remove(player);
 
         base.OnServerDisconnect(conn);
+    }
+
+
+    [Server]
+    public void StartGame()
+    {
+        for (int i = 0; i < m_Tanks.Count; i++)
+        {
+            TankBehaviour player = m_Tanks[i];
+ 
+            // Set new spawn point
+            player.RpcSetSpawnPoint(m_SpawnPoints[i].position, m_SpawnPoints[i].rotation);
+
+            // Set camera to point player
+            player.RpcSetCameraTarget();
+        }
     }
 
 
