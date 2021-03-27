@@ -126,6 +126,7 @@ public class NetworkManagerTank : NetworkManager
 
         // TODO: remove, just for testing
         player.CmdSpawnSoldier(startPos.position, startPos.rotation);
+        player.CmdSpawnMob(startPos.position, startPos.rotation);
 
         // Save player to list
         m_Tanks.Add(player);

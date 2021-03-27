@@ -51,6 +51,24 @@ public class TankBehaviour : NetworkBehaviour
         }
     }
 
+    // TODO: change to command and call from client
+    [Server]
+    public void CmdSpawnMob(Vector3 position, Quaternion rotation)
+    {
+        GameObject mobObject = objectPooler.SpawnFromPool("MobBear", position, rotation);
+
+        if (mobObject != null)
+        {
+            NetworkServer.Spawn(mobObject);
+
+            mobObject.GetComponent<MobMovement>().m_TankOwner = this;
+            mobObject.GetComponent<MobAttack>().m_TankOwner = this;
+
+            //mobObject.GetComponent<MobMovement>().RpcSetTankOwner(gameObject);
+            //mobObject.GetComponent<MobAttack>().RpcSetTankOwner(gameObject);
+        }
+    }
+
     #endregion
 
 
