@@ -9,7 +9,7 @@ public class Shell: Ammo
     
     #region Client
 
-    [Client]
+    [Server]
     private void OnTriggerEnter(Collider other)
     {
         // Find all the tanks in an area around the shell and damage them.
@@ -39,7 +39,7 @@ public class Shell: Ammo
         gameObject.SetActive(false);
     }
 
-    [Client]
+    [Server]
     private float CalculateDamage(Vector3 targetPosition)
     {
         // Calculate the amount of damage a target should take based on it's position.

@@ -8,6 +8,13 @@ public class Shotgun : Weapon, IWeapon
 
     #region Client
 
+    protected override void Start()
+    {
+        m_Timer = 0;
+        m_FireButton = "Fire";
+        objectPooler = ObjectPooler.Instance;
+    }
+
     [Client]
     public override void FireWeapon(Transform m_FireTransform)
     {

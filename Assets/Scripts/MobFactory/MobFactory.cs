@@ -27,7 +27,6 @@ public class MobFactory : NetworkBehaviour
         TankBehaviour tank = tankOwner.gameObject.GetComponent<TankBehaviour>();
 
         SpawnMob(tag, position, rotation, tank);
-        tank.mobDictionary[tag] -= 1;
     }
 
     #endregion

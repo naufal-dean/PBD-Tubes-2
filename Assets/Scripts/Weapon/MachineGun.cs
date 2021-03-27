@@ -8,12 +8,18 @@ public class MachineGun : Weapon, IWeapon
 
     #region Client
 
+    protected override void Start()
+    {
+        m_Timer = 0;
+        m_FireButton = "Fire";
+        objectPooler = ObjectPooler.Instance;
+    }
+
     [Client]
     public override void FireWeapon(Transform fireTransform)
     {
         if (Input.GetButton(m_FireButton) && CanShoot())
         {
-            Debug.Log("Harusnya shooting");
             Fire(fireTransform);
         }
         m_Timer += Time.deltaTime;
@@ -22,9 +28,9 @@ public class MachineGun : Weapon, IWeapon
     [Client]
     public void Fire(Transform fireTransform)
     {
-        // Fire from server
-        Debug.Log("Firing MG");
-        Debug.Log(fireTransform);
+        //// Fire from server
+        //Debug.Log("isClient");
+        //Debug.Log(isClient);
 
         CmdFire(fireTransform.position, fireTransform.rotation, m_BulletSpeed * fireTransform.forward);
 

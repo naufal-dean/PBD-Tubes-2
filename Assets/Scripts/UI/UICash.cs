@@ -7,8 +7,6 @@ using TMPro;
 
 public class UICash : NetworkBehaviour
 {
-    public static int _amountCash;
-
     public TextMeshProUGUI text;
     TankBehaviour _player;
 

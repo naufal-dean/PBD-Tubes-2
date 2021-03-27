@@ -16,9 +16,11 @@ public class TankShell : Weapon, IWeapon
     private bool m_Fired;
 
 
-    protected override void OnEnable()
+    protected override void Start()
     {
         m_Timer = 0;
+        m_FireButton = "Fire";
+        objectPooler = ObjectPooler.Instance;
         m_CurrentLaunchForce = m_MinLaunchForce;
         m_AimSlider.value = m_MinLaunchForce;
         m_ChargeSpeed = (m_MaxLaunchForce - m_MinLaunchForce) / m_MaxChargeTime;
@@ -66,10 +68,14 @@ public class TankShell : Weapon, IWeapon
         m_Timer += Time.deltaTime;
     }
 
-
     [Client]
     void Fire(Transform m_FireTransform)
     {
+        Debug.Log("isClient");
+        Debug.Log(isClient);
+        Debug.Log("isServer");
+        Debug.Log(isServer);
+
         // Update fired flag
         m_Fired = true;
 
