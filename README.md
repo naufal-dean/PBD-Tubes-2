@@ -35,7 +35,7 @@ Permainan 3D *top-down* dengan *gameplay tank battle royale*. Permainan ini meru
 
 ## *Screenshot* aplikasi
 
-## Pembagian kerja anggota kelompok
+## Pembagian Kerja Anggota Kelompok
 * 13518111 - Muhammad Mirza Fathan Al Arsyad: Membuat *map*.
 * 13518123 - Naufal Dean Anugrah:
 * 13518135 - Gregorius Jovan Kresnadi:
