@@ -5,7 +5,7 @@ Permainan 3D *top-down* dengan *gameplay tank battle royale*. Permainan ini meru
 
 ## Deskripsi Singkat Cara kerja
 
-* Permainan dapat dimainkan dengan *single player* ataupun *multiplayer*, secara *local area network* dengan maksimal 4 orang dan minimal dua pemain.
+* Permainan dapat dimainkan dengan *single player* ataupun *multiplayer*, secara *local area network* dengan 4 orang pemain.
 * Nama pemain dapat diatur pada *main menu*.
 * Volume suara dapat diatur pada *main menu*.
 * Terdapat dua desain untuk *map* yang dibuat.
