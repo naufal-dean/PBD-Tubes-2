@@ -78,7 +78,7 @@ public class NetworkManagerTank : NetworkManager
             StopServer();
         }
 
-
+        Application.Quit();
         networkManagerHUD.showGUI = false;
     }
 
@@ -197,6 +197,7 @@ public class NetworkManagerTank : NetworkManager
     private IEnumerator RoundStarting()
     {
         ResetAllTanks();
+        ResetInfantry();
         DisableTankControl();
 
         m_CameraControl.SetStartPositionAndSize();
@@ -314,6 +315,10 @@ public class NetworkManagerTank : NetworkManager
     private void ResetInfantry()
     {
         GameObject[] infantries = GameObject.FindGameObjectsWithTag("Infantry");
+        foreach(GameObject infantry in infantries) {
+            infantry.SetActive(false);
+            NetworkServer.UnSpawn(infantry);
+        }
     }
 
     [Server]
