@@ -26,8 +26,8 @@ public class NetworkManagerTank : NetworkManager
     private WaitForSeconds m_EndWait;
     private TankBehaviour m_RoundWinner;
     private UIText m_UIText;
-    public TankBehaviour m_GameWinner;
-    public bool m_GameRunning = false;
+    [HideInInspector] public TankBehaviour m_GameWinner;
+    [HideInInspector] public bool m_GameRunning = false;
 
     MobFactory mobFactory;
 
@@ -94,7 +94,7 @@ public class NetworkManagerTank : NetworkManager
             return;
         }
 
-        SpawnTank(conn);
+        SpawnTank(conn, numPlayers);
 
         // Start game if player number is enough
         if (numPlayers == m_MaxNumPlayers)
@@ -138,10 +138,10 @@ public class NetworkManagerTank : NetworkManager
 
 
     [Server]
-    private void SpawnTank(NetworkConnection conn)
+    private void SpawnTank(NetworkConnection conn, int spawnNumber)
     {
         // Instanstiate player
-        Transform startPos = GetTankSpawnPoint();
+        Transform startPos = GetTankSpawnPoint(spawnNumber);
         TankBehaviour player =
             Instantiate(playerPrefab, startPos.position, startPos.rotation).GetComponent<TankBehaviour>();
 
@@ -167,11 +167,11 @@ public class NetworkManagerTank : NetworkManager
 
 
     [Server]
-    private Transform GetTankSpawnPoint()
+    private Transform GetTankSpawnPoint(int spawnNumber)
     {
         // TODO: randomize spawn point
 
-        return m_SpawnPoint;
+        return m_SpawnPoints[spawnNumber];
     }
 
 
@@ -250,8 +250,6 @@ public class NetworkManagerTank : NetworkManager
     [Server]
     private bool OneTankLeft()
     {
-        // TODO: remove
-        return false;
 
         int numTanksLeft = 0;
 
