@@ -54,3 +54,7 @@ Permainan 3D _orthographic_ dengan gameplay _Tank Battle Royale_. Permainan ini 
   - Membuat sistem _Cash_ dan pembelian peluru serta infantri
   - Membuat awal sistem _Object Pooling_
   - Modifikasi _map_
+
+## Screenshot
+
+Screenshot bisa dilihat di folder Screenshot pada repositori ini.
