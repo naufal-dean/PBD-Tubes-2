@@ -1,75 +1,101 @@
+using Mirror;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MobAttack : MonoBehaviour
+public class MobAttack : NetworkBehaviour
 {
-    public float timeBetweenAttacks = 0.5f;
-    public int attackDamage = 10;
+    public LayerMask m_TankMask;
+    public float m_TimeBetweenAttacks = 0.5f;
+    public int m_AttackDamage = 10;
 
-
-    Animator anim;
-    GameObject player;
-    //PlayerHealth playerHealth;
-    //EnemyHealth enemyHealth;
-    bool playerInRange;
-    float timer;
+    
+    public TankBehaviour m_TankOwner;
+    private Animator anim;
+    private float m_Timer;
+    private float m_AttackRange;
+    private ParticleSystem m_HitParticles;
 
 
     void Awake()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
-        //playerHealth = player.GetComponent<PlayerHealth>();
-        anim = GetComponent<Animator>();
-        // Mendapatkan Enemy health
-        //enemyHealth = GetComponent<EnemyHealth>();
-    }
-
-    // Callback jika ada suatu object masuk ke dalam trigger
-    void OnTriggerEnter(Collider other)
-    {
-        // Set player in range
-        if (other.gameObject == player && other.isTrigger == false)
-        {
-            playerInRange = true;
-
-        }
-    }
-
-    // Callback jika ada object yang keluar dari trigger
-    void OnTriggerExit(Collider other)
-    {
-        if (other.gameObject == player && other.isTrigger == false)
-        {
-            playerInRange = false;
-        }
+        //anim = GetComponent<Animator>();
+        m_AttackRange = GetComponent<SphereCollider>().radius * 2;
+        m_HitParticles = GetComponentInChildren<ParticleSystem>();
     }
 
 
+    #region Server
+
+    [ServerCallback]
     void Update()
     {
-        //timer += Time.deltaTime;
+        if (!isServer) return;
 
-        //if (timer >= timeBetweenAttacks && playerInRange && enemyHealth.currentHealth > 0)
-        //{
-        //    Attack();
-        //}
+        m_Timer += Time.deltaTime;
 
-        //if (playerHealth.currentHealth <= 0)
-        //{
-        //    anim.SetTrigger("PlayerDead");
-        //}
+        if (m_Timer >= m_TimeBetweenAttacks)
+        {
+            Attack();
+        }
     }
 
 
-    void Attack()
+    [Server]
+    private void Attack()
     {
-        //timer = 0f;
+        // Find all the tanks in an area around the soldier.
+        Collider[] colliders = Physics.OverlapSphere(transform.position, m_AttackRange, m_TankMask);
 
-        //// Taking damage
-        //if (playerHealth.currentHealth > 0)
-        //{
-        //    playerHealth.TakeDamage(attackDamage);
-        //}
+        // Damage all enemy tanks in area
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Rigidbody targetRigidbody = colliders[i].GetComponent<Rigidbody>();
+
+            if (!targetRigidbody)
+                continue;
+
+            TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth>();
+
+            if (!targetHealth)
+                continue;
+
+            if (targetHealth.gameObject.GetComponent<TankBehaviour>() == m_TankOwner)
+                continue;
+
+            DamageEnemy(targetHealth.gameObject);
+
+            RpcPlayEffect(targetHealth.transform.position);
+        }
+
+        // Reset timer
+        m_Timer = 0f;
     }
+
+
+    [Server]
+    private void DamageEnemy(GameObject targetObject)
+    {
+        TankHealth targetHealth = targetObject.GetComponent<TankHealth>();
+
+        targetHealth.m_CurrentHealth = Mathf.Max(targetHealth.m_CurrentHealth - m_AttackDamage, 0);
+    }
+
+    #endregion
+
+
+    #region Client
+
+    [ClientRpc]
+    private void RpcPlayEffect(Vector3 position)
+    {
+        m_HitParticles.transform.position = position;
+        m_HitParticles.Play();
+    }
+
+
+    [ClientRpc]
+    public void RpcSetTankOwner(GameObject tankOwner) => m_TankOwner = tankOwner.GetComponent<TankBehaviour>();
+
+    #endregion
 }

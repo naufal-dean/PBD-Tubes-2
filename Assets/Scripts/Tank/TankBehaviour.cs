@@ -20,6 +20,7 @@ public class TankBehaviour : NetworkBehaviour
     public Quaternion m_SpawnPointRotation;
     [HideInInspector] public string m_ColoredPlayerText;
     [HideInInspector] public int m_Wins;
+    [HideInInspector] public Dictionary<string, int> mobDictionary;
 
 
     private TankMovement m_Movement;
@@ -31,6 +32,9 @@ public class TankBehaviour : NetworkBehaviour
     private void Awake()
     {
         objectPooler = ObjectPooler.Instance;
+        mobDictionary = new Dictionary<string, int>();
+        mobDictionary["Soldier"] = 10;
+        mobDictionary["MobBear"] = 10;
     }
 
 
@@ -46,8 +50,29 @@ public class TankBehaviour : NetworkBehaviour
         {
             NetworkServer.Spawn(soldierObject);
 
-            soldierObject.GetComponent<SoldierMovement>().RpcSetTankOwner(gameObject);
-            soldierObject.GetComponent<SoldierAttack>().RpcSetTankOwner(gameObject);
+            soldierObject.GetComponent<SoldierMovement>().m_TankOwner = this;
+            soldierObject.GetComponent<SoldierAttack>().m_TankOwner = this;
+
+            //soldierObject.GetComponent<SoldierMovement>().RpcSetTankOwner(gameObject);
+            //soldierObject.GetComponent<SoldierAttack>().RpcSetTankOwner(gameObject);
+        }
+    }
+
+    // TODO: change to command and call from client
+    [Server]
+    public void CmdSpawnMob(Vector3 position, Quaternion rotation)
+    {
+        GameObject mobObject = objectPooler.SpawnFromPool("MobBear", position, rotation);
+
+        if (mobObject != null)
+        {
+            NetworkServer.Spawn(mobObject);
+
+            mobObject.GetComponent<MobMovement>().m_TankOwner = this;
+            mobObject.GetComponent<MobAttack>().m_TankOwner = this;
+
+            //mobObject.GetComponent<MobMovement>().RpcSetTankOwner(gameObject);
+            //mobObject.GetComponent<MobAttack>().RpcSetTankOwner(gameObject);
         }
     }
 
@@ -64,15 +89,8 @@ public class TankBehaviour : NetworkBehaviour
         m_CanvasGameObject = GetComponentInChildren<Canvas>().gameObject;
 
         m_Movement.m_PlayerNumber = m_PlayerNumber;
-        m_Shooting.m_PlayerNumber = m_PlayerNumber;
     }
 
-
-    [ClientRpc]
-    public void IGotMoney()
-    {
-        Debug.Log("My money now is: " + m_cashAmount);
-    }
 
     [ClientRpc]
     public void RpcSetCameraTarget()

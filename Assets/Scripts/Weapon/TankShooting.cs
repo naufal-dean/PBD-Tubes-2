@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class TankShooting : NetworkBehaviour
 {
-    public int m_PlayerNumber = 1;       
     public Rigidbody m_Shell;            
     public Transform m_FireTransform;    
     public Slider m_AimSlider;           
