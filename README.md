@@ -38,6 +38,14 @@ Permainan 3D _orthographic_ dengan gameplay _Tank Battle Royale_. Permainan ini 
 
 ## Pembagian Kerja Anggota Kelompok
 
-- 13518111 - Muhammad Mirza Fathan Al Arsyad: Membuat _map_.
+- 13518111 - Muhammad Mirza Fathan Al Arsyad:
+  - Membuat _map_.
 - 13518123 - Naufal Dean Anugrah:
 - 13518135 - Gregorius Jovan Kresnadi:
+  - Membuat senjata tambahan _Machine Gun_ dan _Shotgun_
+  - Membuat kendali untuk ganti senjata, ganti infantri, deploy infantri
+  - Membuat _Start Menu_, _Options Menu_, _Pause Menu_
+  - Implementasi _Volume_ dan nama pemain dengan _PlayerPrevs_, dan peletakan nama di _Tank_
+  - Membuat sistem _Cash_ dan pembelian peluru serta infantri
+  - Membuat awal sistem _Object Pooling_
+  - Modifikasi _map_
