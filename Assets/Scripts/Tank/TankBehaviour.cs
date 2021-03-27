@@ -33,8 +33,6 @@ public class TankBehaviour : NetworkBehaviour
     {
         objectPooler = ObjectPooler.Instance;
         mobDictionary = new Dictionary<string, int>();
-        mobDictionary["Soldier"] = 10;
-        mobDictionary["MobBear"] = 10;
     }
 
 

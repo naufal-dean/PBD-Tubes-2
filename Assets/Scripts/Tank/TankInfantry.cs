@@ -8,13 +8,15 @@ public class TankInfantry : NetworkBehaviour
 {
     public Transform m_MobTransform;
     public float m_fireRate = 1f;
+    public int m_SoldierPrice;
+    public int m_MobPrice;
+    [HideInInspector] public string m_currentInfantry;
+    [HideInInspector] public Dictionary<string, int> mobDictionary;
 
     private string m_MobButton;
     private string m_SwapButton;
     private bool m_Mobbed;
     private float m_timer;
-    private string m_currentInfantry;
-    private Dictionary<string, int> mobDictionary;
     private TankBehaviour m_owner;
 
     MobFactory mobFactory;
@@ -22,6 +24,7 @@ public class TankInfantry : NetworkBehaviour
     private void OnEnable()
     {
         m_owner = gameObject.GetComponent<TankBehaviour>();
+        
     }
 
 
@@ -29,6 +32,8 @@ public class TankInfantry : NetworkBehaviour
     {
        
         mobDictionary = m_owner.mobDictionary;
+        mobDictionary["Soldier"] = m_SoldierPrice;
+        mobDictionary["MobBear"] = m_MobPrice;
         m_MobButton = "DeployInfantry";
         m_SwapButton = "SwapInfantry";
 
@@ -52,14 +57,6 @@ public class TankInfantry : NetworkBehaviour
             CmdDeployInfantry();
 
         }
-        //else if (Input.GetButton(m_MobButton) && !m_Mobbed)
-        //{
-        //    // Holding the fire button, not yet fired
-        //    m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
-
-        //    m_AimSlider.value = m_CurrentLaunchForce;
-
-        //}
 
         if (Input.GetButtonDown(m_SwapButton))
         {
@@ -81,22 +78,18 @@ public class TankInfantry : NetworkBehaviour
         if (mobDictionary[m_currentInfantry] > 0)
         {
             mobFactory.CmdSpawnMob(gameObject, m_currentInfantry, m_MobTransform.transform.position, m_MobTransform.transform.rotation);
+            int cash = gameObject.GetComponent<TankBehaviour>().m_cashAmount;
+            Debug.Log(mobDictionary[m_currentInfantry]);
+            gameObject.GetComponent<TankBehaviour>().m_cashAmount = Mathf.Max(cash - mobDictionary[m_currentInfantry], 0);
+
         }
     }
 
     [Client]
     public bool CanDeploy()
     {
-        return m_timer > m_fireRate;
+        return m_timer > m_fireRate && gameObject.GetComponent<TankBehaviour>().m_cashAmount >= mobDictionary[m_currentInfantry];
     }
-
-
-
-    #endregion
-
-
-    #region Server
-
 
     #endregion
 }
