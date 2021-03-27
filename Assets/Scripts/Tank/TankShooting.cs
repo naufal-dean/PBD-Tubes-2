@@ -68,7 +68,7 @@ public class TankShooting : NetworkBehaviour
 
         if (Input.GetButtonDown("SwapWeapon"))
         {
-            m_SelectedWeapon = (m_SelectedWeapon + 1) % 3;
+            SwapWeapon();
         }
 
         // Track the current state of the fire button and make decisions based on the current launch force.
@@ -143,6 +143,11 @@ public class TankShooting : NetworkBehaviour
         return m_Timer >= m_ShellRate;
     }
 
+    [Client]
+    public void SwapWeapon()
+    {
+        m_SelectedWeapon = (m_SelectedWeapon + 1) % 3;
+    }
 
     [Client]
     public void Fire()

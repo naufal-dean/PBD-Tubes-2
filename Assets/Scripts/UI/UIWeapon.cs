@@ -37,4 +37,9 @@ public class UIWeapon : NetworkBehaviour
 
     }
 
+    public void SwapWeapon()
+    {
+        _shooter.SwapWeapon();
+    }
+
 }

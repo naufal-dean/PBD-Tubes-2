@@ -8,7 +8,7 @@ using TMPro;
 public class UIInfantry : NetworkBehaviour
 {
     public TextMeshProUGUI text;
-    TankInfantry _infantry;
+    public TankInfantry _infantry;
 
     void Update()
     {
@@ -30,6 +30,11 @@ public class UIInfantry : NetworkBehaviour
             text.text = infantry + " ($" + _infantry.mobDictionary[infantry] + ")";
         }
 
+    }
+
+    public void SwapInfantry()
+    {
+        _infantry.SwapInfantry();
     }
 
 }

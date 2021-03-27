@@ -60,13 +60,8 @@ public class TankInfantry : NetworkBehaviour
 
         if (Input.GetButtonDown(m_SwapButton))
         {
-            if (m_currentInfantry == "Soldier")
-            {
-                m_currentInfantry = "MobBear";
-            } else
-            {
-                m_currentInfantry = "Soldier";
-            }
+            SwapInfantry();
+            
             m_timer = 0;
 
         }
@@ -82,6 +77,19 @@ public class TankInfantry : NetworkBehaviour
             Debug.Log(mobDictionary[m_currentInfantry]);
             gameObject.GetComponent<TankBehaviour>().m_cashAmount = Mathf.Max(cash - mobDictionary[m_currentInfantry], 0);
 
+        }
+    }
+
+    [Client]
+    public void SwapInfantry()
+    {
+        if (m_currentInfantry == "Soldier")
+        {
+            m_currentInfantry = "MobBear";
+        }
+        else
+        {
+            m_currentInfantry = "Soldier";
         }
     }
 

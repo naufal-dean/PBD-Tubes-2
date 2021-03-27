@@ -14,7 +14,7 @@ public class TankBehaviour : NetworkBehaviour
     [SyncVar(hook = nameof(SetControl))]
     [HideInInspector] public bool m_Control;
 
-    public int m_cashAmount;
+    public int m_cashAmount = 0;
 
     public Vector3 m_SpawnPointPosition;
     public Quaternion m_SpawnPointRotation;
