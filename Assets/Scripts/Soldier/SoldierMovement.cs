@@ -73,7 +73,10 @@ public class SoldierMovement : NetworkBehaviour
 
             TankBehaviour tankBehaviour = targetRigidbody.GetComponent<TankBehaviour>();
 
-            if (tankBehaviour && tankBehaviour == m_TankOwner)
+            if (!tankBehaviour)
+                continue;
+
+            if (tankBehaviour == m_TankOwner)
                 continue;
 
             float newDistance = Vector3.Distance(targetRigidbody.gameObject.transform.position, gameObject.transform.position);
