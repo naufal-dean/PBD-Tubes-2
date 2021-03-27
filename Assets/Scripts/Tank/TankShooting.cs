@@ -19,13 +19,15 @@ public class TankShooting : NetworkBehaviour
     // MG
     public float m_BulletSpeed;
     public float m_MGRate;
+    public float m_MGPrice;
 
     // Shotgun
     public float m_PelletSpeed;
     public float m_ShotRate;
+    public float m_ShotPrice;
 
-    private string[] m_Weapons;
-    private int m_SelectedWeapon;
+    [HideInInspector] public int m_SelectedWeapon;
+
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
     private float m_ChargeSpeed;
@@ -34,14 +36,11 @@ public class TankShooting : NetworkBehaviour
 
     ObjectPooler objectPooler;
 
-
     private void OnEnable()
     {
         m_CurrentLaunchForce = m_MinLaunchForce;
         m_AimSlider.value = m_MinLaunchForce;
-
     }
-
 
     private void Start()
     {
@@ -53,9 +52,6 @@ public class TankShooting : NetworkBehaviour
 
         m_SelectedWeapon = 0;
 
-            m_Weapons[0] = "Shell";
-            m_Weapons[1] = "Bullet";
-            m_Weapons[2] = "Pellet";
 
     }
 
@@ -95,7 +91,7 @@ public class TankShooting : NetworkBehaviour
                 m_ShootingAudio.clip = m_ChargingClip;
                 m_ShootingAudio.Play();
 
-            } else if (m_SelectedWeapon == 1 && CanShootMg())
+            } else if (m_SelectedWeapon == 1 && CanShootMG())
             {
                 FireMg();
             } else if (m_SelectedWeapon == 2 && CanShootShot())
@@ -113,7 +109,7 @@ public class TankShooting : NetworkBehaviour
 
                 m_AimSlider.value = m_CurrentLaunchForce;
             }
-            else if (m_SelectedWeapon == 1 && CanShootMg())
+            else if (m_SelectedWeapon == 1 && CanShootMG())
             {
                 FireMg();
             }
@@ -132,19 +128,19 @@ public class TankShooting : NetworkBehaviour
         m_Timer += Time.deltaTime;
     }
 
-    public bool CanShootMg()
+    public bool CanShootMG()
     {
-        return m_Timer > m_MGRate;
+        return m_Timer >= m_MGRate && gameObject.GetComponent<TankBehaviour>().m_cashAmount >= m_MGPrice;
     }
 
     public bool CanShootShot()
     {
-        return m_Timer > m_ShotRate;
+        return m_Timer >= m_ShotRate && gameObject.GetComponent<TankBehaviour>().m_cashAmount >= m_ShotPrice;
     }
 
     public bool CanShootShell()
     {
-        return m_Timer > m_ShellRate;
+        return m_Timer >= m_ShellRate;
     }
 
 
@@ -163,6 +159,7 @@ public class TankShooting : NetworkBehaviour
 
         // Reset
         m_CurrentLaunchForce = m_MinLaunchForce;
+
         m_Timer = 0;
     }
 
@@ -196,19 +193,23 @@ public class TankShooting : NetworkBehaviour
         if (m_ShootingAudio)
             m_ShootingAudio.Play();
 
+        int cash = gameObject.GetComponent<TankBehaviour>().m_cashAmount;
+
+        gameObject.GetComponent<TankBehaviour>().m_cashAmount = (int)Mathf.Max(cash - m_MGPrice, 0);
         m_Timer = 0;
     }
     [Client]
     public void FireShotgun()
     {
         CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_PelletSpeed * m_FireTransform.forward, "Pellet");
-        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_PelletSpeed * m_FireTransform.forward, "Pellet");
-        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_PelletSpeed * m_FireTransform.forward, "Pellet");
 
         // Play audio
         if (m_ShootingAudio)
             m_ShootingAudio.Play();
 
+
+        int cash = gameObject.GetComponent<TankBehaviour>().m_cashAmount;
+        gameObject.GetComponent<TankBehaviour>().m_cashAmount = (int)Mathf.Max(cash - m_ShotPrice, 0);
         m_Timer = 0;
     }
 

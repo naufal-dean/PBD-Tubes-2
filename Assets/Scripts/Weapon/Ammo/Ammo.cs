@@ -11,7 +11,7 @@ public class Ammo : NetworkBehaviour, IPooledObject
     public ParticleSystem m_ExplosionParticles;
 
     #region Server
-    [Client]
+    [ClientRpc]
     protected void Explode(Vector3 position, Quaternion rotation)
     {
         m_ExplosionParticles = ObjectPooler.Instance.SpawnFromPool("ShellExplosion", position, rotation).GetComponent<ParticleSystem>();
