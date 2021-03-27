@@ -13,33 +13,33 @@ public abstract class Weapon : NetworkBehaviour
 
     protected ObjectPooler objectPooler;
 
-    protected virtual void OnEnable()
+    protected virtual void Start()
     {
         m_Timer = 0;
+        m_FireButton = "Fire";
+        objectPooler = ObjectPooler.Instance;
     }
 
     public abstract void FireWeapon(Transform m_FireTransform);
 
-    public Weapon()
-    {
-        Debug.Log("Starto");
-        m_FireButton = "Fire";
-        objectPooler = ObjectPooler.Instance;
-        m_FireRate = 1f;
-        m_AmmoType = "Bullet";
-    }
 
     protected bool CanShoot()
     {
         return m_Timer > m_FireRate;
     }
 
+    [Command]
     protected void CmdFire(Vector3 position, Quaternion rotation, Vector3 velocity)
     {
-        // Launch the shell.
 
-        Debug.Log(objectPooler);
-        GameObject ammoObject = objectPooler.SpawnFromPool(m_AmmoType, position, rotation);
+        //Debug.Log("CMD");
+        //Debug.Log("isClient");
+        //Debug.Log(isClient);
+        //Debug.Log("isServer");
+        //Debug.Log(isServer);
+
+        // Fire the gun in server
+        GameObject ammoObject = ObjectPooler.Instance.SpawnFromPool(m_AmmoType, position, rotation);
         if (ammoObject != null)
         {
             Rigidbody ammoInstance = ammoObject.GetComponent<Rigidbody>();
@@ -48,5 +48,6 @@ public abstract class Weapon : NetworkBehaviour
             NetworkServer.Spawn(ammoObject);
         }
     }
+
 
 }

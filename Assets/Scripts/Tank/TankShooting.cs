@@ -13,12 +13,24 @@ public class TankShooting : NetworkBehaviour
     public float m_MaxLaunchForce = 30f; 
     public float m_MaxChargeTime = 0.75f;
 
-    public Weapon[] m_Weapons;
+    // Shell
+    public float m_ShellRate;
+
+    // MG
+    public float m_BulletSpeed;
+    public float m_MGRate;
+
+    // Shotgun
+    public float m_PelletSpeed;
+    public float m_ShotRate;
+
+    private string[] m_Weapons;
     private int m_SelectedWeapon;
     private string m_FireButton;         
     private float m_CurrentLaunchForce;  
     private float m_ChargeSpeed;
     private bool m_Fired;
+    private float m_Timer;
 
     ObjectPooler objectPooler;
 
@@ -40,6 +52,11 @@ public class TankShooting : NetworkBehaviour
         objectPooler = ObjectPooler.Instance;
 
         m_SelectedWeapon = 0;
+
+            m_Weapons[0] = "Shell";
+            m_Weapons[1] = "Bullet";
+            m_Weapons[2] = "Pellet";
+
     }
 
 
@@ -51,45 +68,83 @@ public class TankShooting : NetworkBehaviour
         if (!isLocalPlayer)
             return;
 
-        m_Weapons[m_SelectedWeapon].FireWeapon(m_FireTransform);
+        //m_Weapons[m_SelectedWeapon].FireWeapon(m_FireTransform);
 
         if (Input.GetButtonDown("SwapWeapon"))
         {
-            m_SelectedWeapon = (m_SelectedWeapon + 1) % m_Weapons.Length;
+            m_SelectedWeapon = (m_SelectedWeapon + 1) % 3;
         }
 
-        //// Track the current state of the fire button and make decisions based on the current launch force.
-        //m_AimSlider.value = m_MinLaunchForce;
+        // Track the current state of the fire button and make decisions based on the current launch force.
+        m_AimSlider.value = m_MinLaunchForce;
 
-        //if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
-        //{
-        //    // max charged, not yet fired
-        //    m_CurrentLaunchForce = m_MaxLaunchForce;
-        //    Fire();
-        //}
-        //else if (Input.GetButtonDown(m_FireButton))
-        //{
-        //    // have we pressed fire for the first time?
-        //    m_Fired = false;
-        //    m_CurrentLaunchForce = m_MinLaunchForce;
+        if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired && CanShootShell())
+        {
+            // max charged, not yet fired
+            m_CurrentLaunchForce = m_MaxLaunchForce;
+            Fire();
+        }
+        else if (Input.GetButtonDown(m_FireButton))
+        {
+            if (m_SelectedWeapon == 0 && CanShootShell())
+            {
+                // have we pressed fire for the first time?
+                m_Fired = false;
+                m_CurrentLaunchForce = m_MinLaunchForce;
 
-        //    m_ShootingAudio.clip = m_ChargingClip;
-        //    m_ShootingAudio.Play();
+                m_ShootingAudio.clip = m_ChargingClip;
+                m_ShootingAudio.Play();
 
-        //}
-        //else if (Input.GetButton(m_FireButton) && !m_Fired)
-        //{
-        //    // Holding the fire button, not yet fired
-        //    m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+            } else if (m_SelectedWeapon == 1 && CanShootMg())
+            {
+                FireMg();
+            } else if (m_SelectedWeapon == 2 && CanShootShot())
+            {
+                FireShotgun();
+            }
 
-        //    m_AimSlider.value = m_CurrentLaunchForce;
+        }
+        else if (Input.GetButton(m_FireButton))
+        {
+            if (m_SelectedWeapon == 0 && CanShootShell() && !m_Fired)
+            {
+                // Holding the fire button, not yet fired
+                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
 
-        //}
-        //else if (Input.GetButtonUp(m_FireButton) && !m_Fired)
-        //{
-        //    // released the button, having not fired yet
-        //    Fire();
-        //}
+                m_AimSlider.value = m_CurrentLaunchForce;
+            }
+            else if (m_SelectedWeapon == 1 && CanShootMg())
+            {
+                FireMg();
+            }
+            else if(m_SelectedWeapon == 2 && CanShootShot())
+            {
+                FireShotgun();
+            }
+
+        }
+        else if (Input.GetButtonUp(m_FireButton) && !m_Fired && CanShootShell())
+        {
+            // released the button, having not fired yet
+            Fire();
+        }
+
+        m_Timer += Time.deltaTime;
+    }
+
+    public bool CanShootMg()
+    {
+        return m_Timer > m_MGRate;
+    }
+
+    public bool CanShootShot()
+    {
+        return m_Timer > m_ShotRate;
+    }
+
+    public bool CanShootShell()
+    {
+        return m_Timer > m_ShellRate;
     }
 
 
@@ -100,7 +155,7 @@ public class TankShooting : NetworkBehaviour
         m_Fired = true;
 
         // Fire from server
-        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_CurrentLaunchForce * m_FireTransform.forward);
+        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_CurrentLaunchForce * m_FireTransform.forward, "Shell");
 
         // Play audio
         m_ShootingAudio.clip = m_FireClip;
@@ -108,6 +163,7 @@ public class TankShooting : NetworkBehaviour
 
         // Reset
         m_CurrentLaunchForce = m_MinLaunchForce;
+        m_Timer = 0;
     }
 
     #endregion
@@ -116,10 +172,11 @@ public class TankShooting : NetworkBehaviour
     #region Server
 
     [Command]
-    private void CmdFire(Vector3 position, Quaternion rotation, Vector3 velocity)
+    private void CmdFire(Vector3 position, Quaternion rotation, Vector3 velocity, string weapon)
     {
         // Launch the shell.
-        GameObject shellObject = objectPooler.SpawnFromPool("Shell", position, rotation);
+
+        GameObject shellObject = objectPooler.SpawnFromPool(weapon, position, rotation);
         
         if (shellObject != null)
         {
@@ -128,6 +185,31 @@ public class TankShooting : NetworkBehaviour
 
             NetworkServer.Spawn(shellObject);
         }
+    }
+
+    [Client]
+    public void FireMg()
+    {
+        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_BulletSpeed * m_FireTransform.forward, "Bullet");
+
+        // Play audio
+        if (m_ShootingAudio)
+            m_ShootingAudio.Play();
+
+        m_Timer = 0;
+    }
+    [Client]
+    public void FireShotgun()
+    {
+        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_PelletSpeed * m_FireTransform.forward, "Pellet");
+        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_PelletSpeed * m_FireTransform.forward, "Pellet");
+        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_PelletSpeed * m_FireTransform.forward, "Pellet");
+
+        // Play audio
+        if (m_ShootingAudio)
+            m_ShootingAudio.Play();
+
+        m_Timer = 0;
     }
 
     #endregion
