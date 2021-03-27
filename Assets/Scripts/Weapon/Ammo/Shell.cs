@@ -10,23 +10,6 @@ public class Shell: Ammo
     #region Client
 
     [Client]
-    private void Explode(Vector3 position, Quaternion rotation)
-    {
-        m_ExplosionParticles = ObjectPooler.Instance.SpawnFromPool("ShellExplosion", position, rotation).GetComponent<ParticleSystem>();
-        m_ExplosionParticles.Play();
-        m_ExplosionAudio.Play();
-
-        Invoke(nameof(ExplodeDeactivate), 0.5f);
-    }
-
-    [Client]
-    private void ExplodeDeactivate()
-    {
-        m_ExplosionParticles.gameObject.SetActive(false);
-        CmdDeactivate();
-    }
-
-    [Client]
     private void OnTriggerEnter(Collider other)
     {
         // Find all the tanks in an area around the shell and damage them.

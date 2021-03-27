@@ -5,21 +5,31 @@ using Mirror;
 
 public class Bullet : Ammo
 {
+    #region Client
     [Client]
     private void OnTriggerEnter(Collider other)
     {
-        Rigidbody targetRigidbody = other.GetComponent<Rigidbody>();
-        if(!targetRigidbody)
-            return;
+        Collider[] colliders = Physics.OverlapSphere(transform.position, 1, m_TankMask);
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Rigidbody targetRigidbody = colliders[i].GetComponent<Rigidbody>();
 
-        TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth>();
-        if (!targetHealth)
-            return;
+            if (!targetRigidbody)
+                continue;
 
-        targetHealth.m_CurrentHealth = Mathf.Max(targetHealth.m_CurrentHealth - m_MaxDamage, 0);
+            TankHealth targetHealth = targetRigidbody.GetComponent<TankHealth>();
+
+            if (!targetHealth)
+                continue;
+
+            targetHealth.m_CurrentHealth = Mathf.Max(targetHealth.m_CurrentHealth - m_MaxDamage, 0);
+        }
+
+        Explode(gameObject.transform.position, gameObject.transform.rotation);
 
         gameObject.SetActive(false);
     }
 
+    #endregion
 
 }

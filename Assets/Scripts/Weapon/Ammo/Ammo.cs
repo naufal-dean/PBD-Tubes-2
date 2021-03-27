@@ -10,6 +10,26 @@ public class Ammo : NetworkBehaviour, IPooledObject
     public float m_MaxLifeTime;
     public ParticleSystem m_ExplosionParticles;
 
+    #region Server
+    [Client]
+    protected void Explode(Vector3 position, Quaternion rotation)
+    {
+        m_ExplosionParticles = ObjectPooler.Instance.SpawnFromPool("ShellExplosion", position, rotation).GetComponent<ParticleSystem>();
+        m_ExplosionParticles.Play();
+        m_ExplosionAudio.Play();
+
+        Invoke(nameof(ExplodeDeactivate), 0.5f);
+    }
+
+    [Client]
+    protected void ExplodeDeactivate()
+    {
+        m_ExplosionParticles.gameObject.SetActive(false);
+        CmdDeactivate();
+    }
+    #endregion
+    #region Server
+
     [Server]
     public void OnObjectSpawn()
     {
@@ -28,4 +48,6 @@ public class Ammo : NetworkBehaviour, IPooledObject
     {
         Deactivate();
     }
+
+    #endregion
 }

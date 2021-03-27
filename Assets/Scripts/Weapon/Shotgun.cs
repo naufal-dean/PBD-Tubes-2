@@ -1,18 +1,39 @@
-using System.Collections;
-using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Shotgun : MonoBehaviour
+public class Shotgun : Weapon, IWeapon
 {
-    // Start is called before the first frame update
-    void Start()
+    public float m_PelletSpeed;
+
+    #region Client
+
+    [Client]
+    public override void FireWeapon(Transform m_FireTransform)
     {
-        
+        if (Input.GetButton(m_FireButton) && CanShoot())
+        {
+            Fire(m_FireTransform);
+        }
+        m_Timer += Time.deltaTime;
     }
 
-    // Update is called once per frame
-    void Update()
+    [Client]
+    public void Fire(Transform m_FireTransform)
     {
-        
+        // Fire from server
+        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_PelletSpeed * m_FireTransform.forward);
+        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_PelletSpeed * m_FireTransform.forward);
+        CmdFire(m_FireTransform.position, m_FireTransform.rotation, m_PelletSpeed * m_FireTransform.forward);
+
+        // Play audio
+        if (m_ShootingAudio)
+            m_ShootingAudio.Play();
+
+        m_Timer = 0;
     }
+
+    #endregion
+
+
 }
