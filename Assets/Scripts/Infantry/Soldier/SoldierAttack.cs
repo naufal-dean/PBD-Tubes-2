@@ -57,6 +57,7 @@ public class SoldierAttack : InfantryAttack
                 continue;
 
             Shoot(targetHealth.gameObject.transform.position);
+            break;
         }
 
         // Reset timer
@@ -67,13 +68,15 @@ public class SoldierAttack : InfantryAttack
     [Server]
     void Shoot(Vector3 targetPosition)
     {
-        // Launch the shell.
-        GameObject shellObject = ObjectPooler.Instance.SpawnFromPool("Shell", transform.position + gameObject.transform.forward * 3, transform.rotation);
+        // Launch the bullet.
+        transform.forward = Vector3.Normalize(targetPosition - transform.position);
+        GameObject shellObject = ObjectPooler.Instance.SpawnFromPool("Bullet", transform.position + transform.forward * 5, transform.rotation);
+
 
         if (shellObject != null)
         {
             Rigidbody shellInstance = shellObject.GetComponent<Rigidbody>();
-            shellInstance.velocity = Vector3.Normalize(targetPosition - transform.position) * 3f;
+            shellInstance.velocity = Vector3.Normalize(targetPosition - transform.position) * 20f;
 
             NetworkServer.Spawn(shellObject);
         }
