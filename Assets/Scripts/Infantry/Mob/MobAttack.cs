@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MobAttack : NetworkBehaviour
+public class MobAttack : InfantryAttack
 {
     public LayerMask m_TankMask;
     public float m_TimeBetweenAttacks = 0.5f;

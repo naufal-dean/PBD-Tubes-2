@@ -22,14 +22,11 @@ public class MobFactory : NetworkBehaviour
 
     #region Client
     [Server]
-    public void CmdSpawnMob(GameObject tankOwner, string tag)
+    public void CmdSpawnMob(GameObject tankOwner, string tag, Vector3 position, Quaternion rotation)
     {
-        Vector3 ownerPosition = tankOwner.gameObject.transform.position;
-        Quaternion ownerRotation = tankOwner.gameObject.transform.rotation;
-
         TankBehaviour tank = tankOwner.gameObject.GetComponent<TankBehaviour>();
 
-        SpawnMob(tag, ownerPosition, ownerRotation, tank);
+        SpawnMob(tag, position, rotation, tank);
         tank.mobDictionary[tag] -= 1;
     }
 
@@ -47,8 +44,8 @@ public class MobFactory : NetworkBehaviour
         {
             NetworkServer.Spawn(mobObject);
 
-            mobObject.GetComponent<SoldierMovement>().m_TankOwner = tankOwner;
-            mobObject.GetComponent<SoldierAttack>().m_TankOwner = tankOwner;
+            mobObject.GetComponent<InfantryMovement>().m_TankOwner = tankOwner;
+            mobObject.GetComponent<InfantryAttack>().m_TankOwner = tankOwner;
         }
     }
 

@@ -3,16 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SoldierMovement : NetworkBehaviour
+public class SoldierMovement : InfantryMovement, IPooledObject
 {
     public LayerMask m_TankMask;
     public float m_TargetRadius = 15f;
 
-    public TankBehaviour m_TankOwner;
     private Animator anim;
     private UnityEngine.AI.NavMeshAgent nav;
 
-    void Awake()
+    public void OnObjectSpawn()
     {
         anim = GetComponent<Animator>();
         nav = GetComponent<UnityEngine.AI.NavMeshAgent>();

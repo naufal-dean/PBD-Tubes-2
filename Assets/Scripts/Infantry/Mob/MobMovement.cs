@@ -3,16 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MobMovement : NetworkBehaviour
+public class MobMovement : InfantryMovement, IPooledObject
 {
     public LayerMask m_TankMask;
     public float m_TargetRadius = 15f;
 
-    public TankBehaviour m_TankOwner;
     private Animator anim;
     private UnityEngine.AI.NavMeshAgent nav;
 
-    void Awake()
+    public void OnObjectSpawn()
     {
         //anim = GetComponent<Animator>();
         nav = GetComponent<UnityEngine.AI.NavMeshAgent>();
@@ -55,7 +54,7 @@ public class MobMovement : NetworkBehaviour
 
 
     [Server]
-    private GameObject DetectEnemyPosition()
+    public GameObject DetectEnemyPosition()
     {
         GameObject target = null;
         float minDistance = float.MaxValue;

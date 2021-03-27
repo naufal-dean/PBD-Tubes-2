@@ -4,7 +4,7 @@ using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TankMobbing : NetworkBehaviour
+public class TankInfantry : NetworkBehaviour
 {
     public Transform m_MobTransform;
     public float m_fireRate = 1f;
@@ -17,9 +17,7 @@ public class TankMobbing : NetworkBehaviour
     private Dictionary<string, int> mobDictionary;
     private TankBehaviour m_owner;
 
-    ObjectPooler objectPooler;
     MobFactory mobFactory;
-
 
     private void OnEnable()
     {
@@ -36,7 +34,6 @@ public class TankMobbing : NetworkBehaviour
 
         m_currentInfantry = "Soldier";
 
-        objectPooler = ObjectPooler.Instance;
         mobFactory = MobFactory.Instance;
     }
 
@@ -51,11 +48,8 @@ public class TankMobbing : NetworkBehaviour
 
         if (Input.GetButtonDown(m_MobButton) && CanDeploy())
         {
-            // have we pressed fire for the first time?
-            //m_Mobbed = false;
             m_timer = 0;
             CmdDeployInfantry();
-            // reset timer for deployment
 
         }
         //else if (Input.GetButton(m_MobButton) && !m_Mobbed)
@@ -76,6 +70,7 @@ public class TankMobbing : NetworkBehaviour
             {
                 m_currentInfantry = "Soldier";
             }
+            m_timer = 0;
 
         }
         m_timer += Time.deltaTime;
@@ -85,7 +80,7 @@ public class TankMobbing : NetworkBehaviour
     {
         if (mobDictionary[m_currentInfantry] > 0)
         {
-            mobFactory.CmdSpawnMob(gameObject, m_currentInfantry);
+            mobFactory.CmdSpawnMob(gameObject, m_currentInfantry, m_MobTransform.transform.position, m_MobTransform.transform.rotation);
         }
     }
 

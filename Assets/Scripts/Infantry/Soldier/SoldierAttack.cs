@@ -3,13 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SoldierAttack : NetworkBehaviour
+public class SoldierAttack : InfantryAttack
 {
     public float timeBetweenAttacks = 0.5f;
     public int attackDamage = 10;
 
 
-    public TankBehaviour m_TankOwner;
     private Animator anim;
     private bool playerInRange;
     private float timer;
