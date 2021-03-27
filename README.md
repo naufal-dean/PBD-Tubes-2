@@ -41,6 +41,11 @@ Permainan 3D _orthographic_ dengan gameplay _Tank Battle Royale_. Permainan ini 
 - 13518111 - Muhammad Mirza Fathan Al Arsyad:
   - Membuat _map_.
 - 13518123 - Naufal Dean Anugrah:
+  - Membuat struktur multiplayer awal dan beberapa integrasi dengan fitur lain.
+  - Membuat karakter bergerak mob bear.
+  - Membuat karakter bergerak soldier.
+  - Membuat movement dan attack dari karakter mob bear dan soldier.
+  - Membuat animasi pada karakter soldier.
 - 13518135 - Gregorius Jovan Kresnadi:
   - Membuat senjata tambahan _Machine Gun_ dan _Shotgun_
   - Membuat kendali untuk ganti senjata, ganti infantri, deploy infantri
