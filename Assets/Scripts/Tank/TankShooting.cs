@@ -4,7 +4,6 @@ using UnityEngine.UI;
 
 public class TankShooting : NetworkBehaviour
 {
-    public Rigidbody m_Shell;            
     public Transform m_FireTransform;    
     public Slider m_AimSlider;           
     public AudioSource m_ShootingAudio;  

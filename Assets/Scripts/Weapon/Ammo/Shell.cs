@@ -1,41 +1,12 @@
 ﻿using Mirror;
 using UnityEngine;
 
-public class ShellExplosion : NetworkBehaviour, IPooledObject
+public class Shell: Ammo
 {
-    public LayerMask m_TankMask;
-    public AudioSource m_ExplosionAudio;
-    public float m_MaxDamage = 100f;
-    public float m_ExplosionForce = 1000f;
-    public float m_MaxLifeTime = 2f;
-    public float m_ExplosionRadius = 5f;
-    ParticleSystem m_ExplosionParticles;
+    public float m_ExplosionForce;
+    public float m_ExplosionRadius;
 
-
-    #region Server
-
-    [Server]
-    public void OnObjectSpawn()
-    {
-        Invoke(nameof(Deactivate), m_MaxLifeTime);
-    }
-
-    [Server]
-    private void Deactivate()
-    {
-        gameObject.SetActive(false);
-        NetworkServer.UnSpawn(gameObject);
-    }
-
-    [Command]
-    private void CmdDeactivate()
-    {
-        Deactivate();
-    }
-
-    #endregion
-
-
+    
     #region Client
 
     [Client]
