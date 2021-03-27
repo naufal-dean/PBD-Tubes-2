@@ -20,6 +20,7 @@ public class TankBehaviour : NetworkBehaviour
     public Quaternion m_SpawnPointRotation;
     [HideInInspector] public string m_ColoredPlayerText;
     [HideInInspector] public int m_Wins;
+    [HideInInspector] public Dictionary<string, int> mobDictionary;
 
 
     private TankMovement m_Movement;
@@ -31,6 +32,9 @@ public class TankBehaviour : NetworkBehaviour
     private void Awake()
     {
         objectPooler = ObjectPooler.Instance;
+        mobDictionary = new Dictionary<string, int>();
+        mobDictionary["Soldier"] = 0;
+        mobDictionary["MobBear"] = 0;
     }
 
 
